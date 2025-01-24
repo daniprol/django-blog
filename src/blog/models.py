@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 from django.db.models.functions import Now
+from django.urls import reverse
 from django.utils import timezone
 
 
@@ -27,7 +28,9 @@ class Post(models.Model):
 
     title = models.CharField(max_length=250)  # VARCHAR
     # VARCHAR with only letters, numbers, hyphens and underscores
-    slug = models.SlugField(max_length=250)  # will create INDEX by default
+    slug = models.SlugField(max_length=250, unique_for_date="publish")  # will create INDEX by default
+    # slug must be unique for each "publish" DATE (only date?) to be able to build a url like /yyyy/mm/dd/slug
+    # NOTE: this is enforced in django, not in the DB. But migration will copy all table data to enforce uniqueness
     # Can also use primary-key=True for this one
 
     # add null=True (and blank=True ???) to allow anonymous users to create snippets as well
@@ -55,3 +58,8 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title  # for Django-admin
+
+    def get_absolute_url(self):
+        # This will build the URL dynamically using the urlpatterns
+        # return reverse("blog:post_detail", args=[self.id])
+        return reverse("blog:post_detail", args=[self.publish.year, self.publish.month, self.publish.day, self.slug])
