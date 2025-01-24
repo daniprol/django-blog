@@ -1,0 +1,13 @@
+from django.urls import path
+
+from . import views
+
+# DEFINES AN APPLICATION NAMESPACE
+app_name = "blog"
+
+urlpatterns = [
+    path("", views.post_list, name="post_list"),
+    # Can we use <int:pk> too?
+    path("<int:id>", views.post_detail, name="post_detail"),
+    # This will be called as post_detail(request, id=<id>)
+]

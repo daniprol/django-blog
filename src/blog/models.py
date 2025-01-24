@@ -4,8 +4,21 @@ from django.db.models.functions import Now
 from django.utils import timezone
 
 
+class PublishedManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(status=Post.Status.PUBLISHED)  # notice "Status" because it's the enum!
+
+    def not_published(self):
+        """Use with Post.published.not_published()"""
+        return super().get_queryset().exclude(status=Post.Status.DRAFT)
+
+
 # IMPORTANT: an index will be created on "author_id", "slug" and also "publish" columns!
 class Post(models.Model):
+    # FIRST DECLARED MANAGER WILL BE THE DEFAULT ONE!
+    objects = models.Manager()  # DEFAULT MANAGER NEEDS TO BE DECLARED IF WE HAVE MORE!
+    published = PublishedManager()  # INSTANTIATE THE MANAGER
+
     class Status(models.TextChoices):
         # (Values, Labels or readable names)
         DRAFT = "DF", "Draft"
@@ -37,6 +50,8 @@ class Post(models.Model):
         # NOTE: order applies by default to QuerySet unless an explicit order_by() is used
         indexes = [models.Index(fields=["-publish"])]
         # db_table = "custom_table_name"
+        # Specify which manager will be the default one (for objects, django admin, serialization...)
+        # default_manager_name = "published"
 
     def __str__(self):
         return self.title  # for Django-admin
