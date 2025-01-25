@@ -8,6 +8,8 @@ django-admin startproject mysite src
 ./manage.py runserver 127.0.0.1:8000 --settings=mysite.settings
 
 ``` 
+# IMPORTANT:
+* Use `request.GET.get("query")` to get *query params*.
 
 # Good practices:
 * URLs in templates: `<a href="{% url 'blog:post_detail' post.id}">`
