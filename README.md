@@ -11,6 +11,10 @@ django-admin startproject mysite src
 # IMPORTANT:
 * Use `request.GET.get("query")` to get *query params*.
 
+
+# Insights:
+> Class based views are views implemented as python classes instead of normal functions. Useful to group related functionality as *mixins*.
+
 # Good practices:
 * URLs in templates: `<a href="{% url 'blog:post_detail' post.id}">`
 
