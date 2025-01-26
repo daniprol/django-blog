@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "taggit",
     "blog.apps.BlogConfig",
 ]
 
@@ -149,3 +150,26 @@ DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="webmaster@localhost")
 
 # Directory to store emails when using file-based email backend
 EMAIL_FILE_PATH = "tmp_email"
+
+# LOGGING_LEVEL = "DEBUG" if DEBUG else "INFO"
+LOGGING_LEVEL = "INFO"
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    # "filters": {
+    #     "require_debug_true": {
+    #         "()": "django.utils.log.RequireDebugTrue",
+    #     }
+    # },
+    "handlers": {
+        "console": {
+            "level": LOGGING_LEVEL,
+            # 'filters': ['require_debug_true'],
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {
+        "django.db.backends": {"handlers": ["console"], "level": LOGGING_LEVEL, "propagate": False},
+    },
+}
