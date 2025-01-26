@@ -3,6 +3,7 @@ from django.db import models
 from django.db.models.functions import Now
 from django.urls import reverse
 from django.utils import timezone
+from taggit.managers import TaggableManager
 
 
 class PublishedManager(models.Manager):
@@ -48,6 +49,13 @@ class Post(models.Model):
     created = models.DateTimeField(auto_now_add=True)  # DATETIME
     updated = models.DateTimeField(auto_now=True)  # DATETIME
     status = models.CharField(max_length=2, choices=Status, default=Status.DRAFT)
+
+    tags = TaggableManager()
+    # TAGS TABLE: id (pk), name, slug
+    # TAGGEDITEM TABLE: id, tag (fk), content_type (fk), object_id (int)
+    # (content_type, object_id) form a generic relationship between Tag and any other model instance of the app
+    # To add tags: post.tags.add("ML", "LLM")
+    # post.tags.remove("AI")
 
     class Meta:
         ordering = ["-publish"]  # latest posts first

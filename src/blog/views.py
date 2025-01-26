@@ -5,13 +5,20 @@ from django.http.request import HttpRequest
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
 from django.views.generic import ListView
+from taggit.models import Tag
 
 from .forms import CommentForm, EmailPostForm
 from .models import Post
 
 
-def post_list(request: HttpRequest):
+def post_list(request: HttpRequest, tag_slug=None):
     post_list = Post.published.all()
+    tag = None
+
+    if tag_slug:  # path parameter only passed in "tag/<slug>"
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        # Start from the existing Post Queryset
+        post_list = post_list.filter(tags__in=[tag])
 
     paginator = Paginator(post_list, 3)  # 3 posts per page
     page_number = request.GET.get("page", 1)
@@ -23,13 +30,14 @@ def post_list(request: HttpRequest):
     except EmptyPage:
         posts = paginator.page(paginator.num_pages)
 
-    return render(request, "blog/post/list.html", {"posts": posts})
+    return render(request, "blog/post/list.html", {"posts": posts, "tag": tag})
 
 
 class PostListView(ListView):
     """Alternative to post_list"""
 
     queryset = Post.published.all()
+    # queryset = Post.published.all().prefetch_related('tags')
     # NOTE: using queryset = Post <===> queryset = Post.objects.all()
     context_object_name = "posts"  # how to pass the result of queryset to template context
     paginate_by = 3
