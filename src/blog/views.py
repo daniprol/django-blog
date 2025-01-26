@@ -1,5 +1,6 @@
 from django.core.mail import send_mail
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.db.models import Count
 from django.http import Http404
 from django.http.request import HttpRequest
 from django.shortcuts import get_object_or_404, render
@@ -63,7 +64,21 @@ def post_detail(request: HttpRequest, year: int, month: int, day: int, slug: str
     # Show only active comments
     comments = post.comments.filter(active=True)  # Notice that we return a Queryset!
     form = CommentForm()
-    return render(request, "blog/post/detail.html", {"post": post, "comments": comments, "form": form})
+
+    # List of similar posts by using tags
+    # values_lists returns a list of tuples of the specified columns.
+    # Flat makes it a single list if only 1 column is retrieved
+    post_tags_ids = post.tags.values_list("id", flat=True)
+    similar_posts = Post.published.filter(tags__in=post_tags_ids).exclude(id=post.id)
+
+    N_SIMILAR_POSTS = 4
+    # "annotate" is used to add new fields to the objects (usually functions)
+    similar_posts = similar_posts.annotate(same_tags=Count("tags")).order_by("-same_tags", "-publish")[:N_SIMILAR_POSTS]
+    return render(
+        request,
+        "blog/post/detail.html",
+        {"post": post, "comments": comments, "form": form, "similar_posts": similar_posts},
+    )
 
 
 def post_share(request: HttpRequest, post_id: int):
