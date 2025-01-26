@@ -14,9 +14,13 @@ django-admin startproject mysite src
 
 # Insights:
 > Class based views are views implemented as python classes instead of normal functions. Useful to group related functionality as *mixins*.
+> **SSL:** While HTTPS originally used SSL, modern HTTPS connections use TLS. The terms SSL and TLS are often used interchangeably, but TLS is the current standard.
 
+Each form field has a default *widget* type that determines how it's rendered in the HTML (e.g., `Charfield --> input type=text`)
+Use `<form novalidate>` to avoid the browser default form validation
 # Good practices:
 * URLs in templates: `<a href="{% url 'blog:post_detail' post.id}">`
+* Group each app's forms in `forms.py`.
 
 # DJANGO ORM Crash Course
 * By default `objects` manager is created. If we create a different manager, then `objects` needs to be explicitly created!

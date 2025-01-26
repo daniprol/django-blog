@@ -1,11 +1,11 @@
-from ast import List
-
+from django.core.mail import send_mail
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import Http404
 from django.http.request import HttpRequest
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import ListView
 
+from .forms import EmailPostForm
 from .models import Post
 
 
@@ -51,3 +51,34 @@ def post_detail(request: HttpRequest, year: int, month: int, day: int, slug: str
         Post, status=Post.Status.PUBLISHED, slug=slug, publish__year=year, publish__month=month, publish__day=day
     )
     return render(request, "blog/post/detail.html", {"post": post})
+
+
+def post_share(request: HttpRequest, post_id: int):
+    # Make sure to filter by published posts
+    post = get_object_or_404(Post, id=post_id, status=Post.Status.PUBLISHED)
+
+    # Used to show success message in the template when email is sent
+    sent = False
+
+    if request.method == "POST":
+        # Use POST data to fill the form
+        form = EmailPostForm(request.POST)
+        # DO I NEED TO VALIDATE THE FORM TO GET form.clean_data?
+        if form.is_valid():
+            # ...
+            data = form.cleaned_data
+            # dict with fields and values: values are also NORMALIZED
+            # If your form data does not validate, cleaned_data will contain only the valid fields.
+            # TODO: check what happens in cleaned_data when only some fields are valid
+            post_url = request.build_absolute_uri(post.get_absolute_url())
+            subject = f"{data['name']} ({data['email']} recommends you read {post.title})"
+            message = f"Read {post.title} at {post_url}\n\n{data['name']}'s comments: {data['comments']}"
+            # from_email=None will make it use settings.DEFAULT_FROM_EMAIL
+            send_mail(
+                subject=subject, message=message, from_email=None, recipient_list=[data["to"]], fail_silently=False
+            )
+            sent = True
+        # Else: form will be returns to template with: form.errors
+    else:
+        form = EmailPostForm()  # creates empty form
+    return render(request, "blog/post/share.html", {"post": post, "form": form, "sent": sent})

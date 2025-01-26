@@ -11,5 +11,6 @@ urlpatterns = [
     # Can we use <int:pk> too?
     # path("<int:id>", views.post_detail, name="post_detail"),
     # This will be called as post_detail(request, id=<id>)
-    path("<int:year>/<int:month>/<int:day>/<slug:slug>", views.post_detail, name="post_detail"),
+    path("<int:year>/<int:month>/<int:day>/<slug:slug>/", views.post_detail, name="post_detail"),
+    path("<int:post_id>/share/", views.post_share, name="post_share"),
 ]

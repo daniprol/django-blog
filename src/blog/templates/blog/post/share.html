@@ -1,0 +1,21 @@
+{% extends "blog/base.html" %}
+
+{% block title %}Share a post{% endblock %}
+
+{% block content %}
+{% if sent %}
+<h1>E-mail successfully sent</h1>
+<p>"{{ post.title }}" was successfully sent to {{ form.cleaned_data.to }}.</p>
+{% else %}
+<h1>Share "{{ post.title }}" by email</h1>
+<!-- No need to specify "action" url since we are posting to same url -->
+<form method="post" novalidate>
+    <!-- Forms can be serialized in different ways: form.as_ul, form.as_table -->
+    {{ form.as_p }}
+    {% csrf_token %}
+    <input type="submit" value="Send email">
+</form>
+
+{% endif %}
+
+{% endblock %}
