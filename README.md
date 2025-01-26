@@ -18,6 +18,20 @@ django-admin startproject mysite src
 
 Each form field has a default *widget* type that determines how it's rendered in the HTML (e.g., `Charfield --> input type=text`)
 Use `<form novalidate>` to avoid the browser default form validation
+ 
+To use custom HTML markup in forms:
+```html
+{% for field in form %}
+<div class="my-div">
+{{ field.errors }}
+{{ field.label_tag }} {{ field }}
+<div class="help-text">{{ field.help_text|safe }}</div>
+</div>
+{% endfor %}
+```
+
+In Django 5.0, the `as_field_group` method allows you to render HTML for the label, field, help text and errors: `form.name.as_field_group` (*no need to call the method!*)
+
 # Good practices:
 * URLs in templates: `<a href="{% url 'blog:post_detail' post.id}">`
 * Group each app's forms in `forms.py`.
