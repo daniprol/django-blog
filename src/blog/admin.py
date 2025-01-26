@@ -1,6 +1,7 @@
 from django.contrib import admin
+from django.db.models import F
 
-from .models import Post
+from .models import Comment, Post
 
 # admin.site.register(Post)
 
@@ -18,3 +19,24 @@ class PostAdmin(admin.ModelAdmin):
 
     # Will always show "counts". Instead of being toggable
     show_facets = admin.ShowFacets.ALWAYS
+
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ["name", "email", "post", "created", "active"]
+    list_filter = ["active", "created", "updated"]  # last day, last month...
+    search_fields = ["name", "email", "body"]
+    # You can define action as a normal function and add it here too
+    actions = ["deactivate_comments", "toggle_activate"]
+
+    def deactivate_comments(self, request, queryset):
+        """Takes queryset of comments and deactivates them"""
+        queryset.update(active=False)
+
+    deactivate_comments.short_description = "Deactivate selected comments"
+
+    def toggle_activate(self, request, queryset):
+        # NOTE: "F" expressions allow to reference a model field to make operations without having to fetch them in Python first
+        queryset.update(active=~F("active"))
+
+    toggle_activate.short_description = "Toggle activate in selected comments"

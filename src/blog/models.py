@@ -37,6 +37,7 @@ class Post(models.Model):
     # NOTE: if you want to create the foreign key on a field that is not a PK: to_field="email" or to_field=User.email
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="blog_posts")
     # related_name: User object will have access to "blog_posts"
+    # NOTICE THAT ADDING "author" WILL CREATE A "author_id" COLUMN!
 
     # NOTE: index will be created on author_id because using a ForeignKey implies creating an index by default!
 
@@ -63,3 +64,26 @@ class Post(models.Model):
         # This will build the URL dynamically using the urlpatterns
         # return reverse("blog:post_detail", args=[self.id])
         return reverse("blog:post_detail", args=[self.publish.year, self.publish.month, self.publish.day, self.slug])
+
+
+class Comment(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")  # plural because one-to-many
+    # Notice that "post" will create "post_id" column instead!
+    # Using related_name will allow you to post.comments.all().
+    # By default it would be: post.comment_set
+
+    name = models.CharField(max_length=80)
+    email = models.EmailField()
+    body = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    active = models.BooleanField(default=True)  # useful for censorship
+
+    class Meta:
+        ordering = ["created"]  # oldest first?
+        indexes = [
+            models.Index(fields=["created"]),
+        ]  # post_id index is automatically created!
+
+    def __str__(self):
+        return f"Comment by {self.name} on post {self.post}"  # self.post uses __str__ !

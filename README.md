@@ -50,4 +50,16 @@ second_year = Q(published_year=2000)
 Posts.objects.filter(first_year | second_year)
 ```
 
+* You can create child objects directly from parent object:
+```python
+new_article = r.article_set.create(...)
+new_comment = post.comments.create(...)
+```
+* Notice that in a *one-to-many* relationship, if you add an existing child object to another parent, it will be removed from the original parent!
+```python
+r2.article_set.add(new_article2)
+```
+* `models.ForeignKeyField` are used for a *one-to-many* relationship. Use `model.OneToOneField` for a *one-to-one* relationship
+
+
 

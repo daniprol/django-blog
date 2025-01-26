@@ -3,9 +3,10 @@ from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import Http404
 from django.http.request import HttpRequest
 from django.shortcuts import get_object_or_404, render
+from django.views.decorators.http import require_POST
 from django.views.generic import ListView
 
-from .forms import EmailPostForm
+from .forms import CommentForm, EmailPostForm
 from .models import Post
 
 
@@ -50,7 +51,11 @@ def post_detail(request: HttpRequest, year: int, month: int, day: int, slug: str
     post = get_object_or_404(
         Post, status=Post.Status.PUBLISHED, slug=slug, publish__year=year, publish__month=month, publish__day=day
     )
-    return render(request, "blog/post/detail.html", {"post": post})
+
+    # Show only active comments
+    comments = post.comments.filter(active=True)  # Notice that we return a Queryset!
+    form = CommentForm()
+    return render(request, "blog/post/detail.html", {"post": post, "comments": comments, "form": form})
 
 
 def post_share(request: HttpRequest, post_id: int):
@@ -82,3 +87,23 @@ def post_share(request: HttpRequest, post_id: int):
     else:
         form = EmailPostForm()  # creates empty form
     return render(request, "blog/post/share.html", {"post": post, "form": form, "sent": sent})
+
+
+# Only form submissions are allowed in this view. Otherwise a 405 status code will be returned
+@require_POST
+def post_comment(request: HttpRequest, post_id: int):
+    post = get_object_or_404(Post, id=post_id, status=Post.Status.PUBLISHED)
+    comment = None
+
+    form = CommentForm(data=request.POST)
+
+    if form.is_valid():
+        # create a comment model instance but don't save it to the DB yet
+        comment = form.save(commit=False)
+
+        # assign it to the post
+        comment.post = post
+        comment.save()
+
+    # If form is invalid will render the template with the form errors
+    return render(request, "blog/post/comment.html", {"post": post, "form": form, "comment": comment})
