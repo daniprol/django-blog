@@ -32,6 +32,9 @@ To use custom HTML markup in forms:
 
 In Django 5.0, the `as_field_group` method allows you to render HTML for the label, field, help text and errors: `form.name.as_field_group` (*no need to call the method!*)
 
+* Filters expression: `{{ variable|my_filter:"foo" }}`, `{{ variable|filter1|filter2 }}`
+
+
 # Good practices:
 * URLs in templates: `<a href="{% url 'blog:post_detail' post.id}">`
 * Group each app's forms in `forms.py`.

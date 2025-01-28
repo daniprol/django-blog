@@ -74,6 +74,7 @@ def post_detail(request: HttpRequest, year: int, month: int, day: int, slug: str
     N_SIMILAR_POSTS = 4
     # "annotate" is used to add new fields to the objects (usually functions)
     similar_posts = similar_posts.annotate(same_tags=Count("tags")).order_by("-same_tags", "-publish")[:N_SIMILAR_POSTS]
+    # TODO: check taggit's builtin post.tags.similar_objects() function
     return render(
         request,
         "blog/post/detail.html",

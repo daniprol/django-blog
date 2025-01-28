@@ -1,4 +1,6 @@
 {% extends "blog/base.html" %}
+<!-- Do not use qoutes to load a template tag! -->
+{% load blog_tags %}
 
 {% block title %}{{ post.title }}{% endblock %}
 
@@ -6,7 +8,8 @@
 <h1>{{ post.title }}</h1>
 <p class="date">Published {{ post.publish }} by {{ post.author }}</p>
 <!-- linebreaks adds paragraphs and line breaks to text strings -->
-{{ post.body|linebreaks }}
+<!--  post.body|linebreaks  -->
+{{ post.body|markdown }}
 <p><a href="{% url 'blog:post_share' post.id %}">Share this post</a></p>
 
 <h2>Similar posts</h2>
