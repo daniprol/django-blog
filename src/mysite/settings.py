@@ -29,6 +29,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# NOTE: the sitemap framework allows more than 1 website per Django app
+SITE_ID = 1
 
 # Application definition
 
@@ -38,6 +40,9 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    # sitemap framework:
+    "django.contrib.sites",
+    "django.contrib.sitemaps",
     "django.contrib.staticfiles",
     "taggit",
     "blog.apps.BlogConfig",
