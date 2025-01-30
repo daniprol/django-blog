@@ -24,6 +24,32 @@ class Repository(models.Model):
         return Repository(**dict((field, data.get(field)) for field in cls._fields_names()))
 
     class Meta:
+        # IMPORTANT: model wont be managed by Django ORM
         managed = False
         verbose_name = "Repository"
         verbose_name_plural = "Repositories"
+
+
+class Recipe(models.Model):
+    link = models.TextField("link", max_length=1024 * 3, primary_key=True)
+    title = models.CharField("Title", max_length=1024 * 3)
+    ner_length = models.TextField("NER length")
+    directions_length = models.TextField("Directions length")
+    ner = models.JSONField("NER")
+    ingredients = models.JSONField("Ingredients")
+    directions = models.JSONField("Directions")
+    # source = models.TextField("Source")
+
+    @classmethod
+    @cache
+    def _fields_names(cls):
+        return [f.name for f in Recipe._meta.fields]
+
+    @classmethod
+    def build_from(cls, data):
+        return Recipe(**dict((field, data.get(field)) for field in cls._fields_names()))
+
+    class Meta:
+        managed = False
+        verbose_name = "Recipe"
+        verbose_name_plural = "Recipes"
