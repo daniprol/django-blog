@@ -1,4 +1,6 @@
 from django import forms
+from import_export.formats.base_formats import CSV, XLSX
+from import_export.forms import ImportForm
 
 from .models import Comment
 
@@ -20,3 +22,16 @@ class CommentForm(forms.ModelForm):
 
 class SearchForm(forms.Form):
     query = forms.CharField()
+
+
+class CustomImportForm(ImportForm):
+    def clean_import_file(self):
+        data = self.cleaned_data["import_file"]
+        file_extension = data.name.split(".")[-1].lower()
+        if file_extension == "xlsx":
+            self.cleaned_data["import_format"] = XLSX()
+        elif file_extension == "csv":
+            self.cleaned_data["import_format"] = CSV()
+        else:
+            raise ValueError("Unsupported file format. Only .xlsx and .csv are supported.")
+        return data

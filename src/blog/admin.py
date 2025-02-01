@@ -1,13 +1,24 @@
 from django.contrib import admin
 from django.db.models import F
+from import_export.admin import ImportExportModelAdmin, ImportMixin
+from import_export.formats.base_formats import CSV, XLSX
+
+from blog.forms import CustomImportForm
 
 from .models import Comment, Post
+from .resources import PostResource
 
 # admin.site.register(Post)
 
 
+# @admin.register(Post)
+# class PostAdmin(admin.ModelAdmin):
 @admin.register(Post)
-class PostAdmin(admin.ModelAdmin):
+class PostAdmin(ImportExportModelAdmin):
+    resource_class = PostResource
+    formats = [XLSX, CSV]
+    # import_form_class = CustomImportForm
+
     list_display = ["title", "slug", "author", "publish", "status"]
     list_filter = ["status", "created", "publish", "author"]
     search_fields = ["title", "body"]
@@ -19,6 +30,9 @@ class PostAdmin(admin.ModelAdmin):
 
     # Will always show "counts". Instead of being toggable
     show_facets = admin.ShowFacets.ALWAYS
+
+    def has_export_permission(self, request):
+        return False
 
 
 @admin.register(Comment)

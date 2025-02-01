@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "django.contrib.sitemaps",
     "django.contrib.staticfiles",
     "django.contrib.postgres",
+    "import_export",
     "taggit",
     "blog.apps.BlogConfig",
 ]
@@ -183,5 +184,9 @@ LOGGING = {
     },
     "loggers": {
         "django.db.backends": {"handlers": ["console"], "level": LOGGING_LEVEL, "propagate": False},
+        "import_export": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+        },
     },
 }
