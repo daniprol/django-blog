@@ -1,0 +1,37 @@
+{% extends "blog/base.html" %}
+
+{% load blog_tags %}
+
+{# djlint:off T003 #}
+{% block title %}Search{% endblock %}
+{# djlint:on #}
+{% block content %}
+    {% if query %}
+        <h1>Posts containing: "{{ query }}"</h1>
+        <h3>
+            <!--  results is a queryset -->
+            {% with results.count as total_results %}
+                Found {{ total_results }} result{{ total_results|pluralize }}
+            {% endwith %}
+        </h3>
+        {% for post in results %}
+            <h4>
+                <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                {{ post.body|markdown|truncatewords_html:12 }}
+            </h4>
+        {% empty %}
+            <p>There are no results for your query</p>
+        {% endfor %}
+        <p>
+            {% comment %} Looks like you always need quotes: "blog:post_search" {% endcomment %}
+            <a href="{% url "blog:post_search" %}">Search again</a>
+        </p>
+    {% else %}
+        <h1>Search for posts</h1>
+        <!--no need to specify the action since we are submitting to the same endpoint -->
+        <form method="get">
+            {{ form.as_p }}
+            <input type="submit" value="Search">
+        </form>
+    {% endif %}
+{% endblock content %}

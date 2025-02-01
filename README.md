@@ -35,6 +35,17 @@ In Django 5.0, the `as_field_group` method allows you to render HTML for the lab
 * Filters expression: `{{ variable|my_filter:"foo" }}`, `{{ variable|filter1|filter2 }}`
 * Sitemap: in Django admin modify the site name to modify the url that appears in the `sitemap.xml`
 
+* Fixtures: Django tool to load/dump data from database to file.
+```bash
+./manage.py dumpdata --indent 2 --ouput=db_data.json <blog.Post> <blog.Comment>
+./manage.py loaddat db_data.json
+```
+**IMPORTANT**: *contenttypes* framework contains metadata about your models that is added during migrations, so you may need to exclude it when dumping data:
+```
+--exclude=contenttypes
+```
+You may also need to exclude `auth.Permission` since the default CRUD permissions for model are created on migrate
+
 
 
 # Good practices:
@@ -81,4 +92,29 @@ r2.article_set.add(new_article2)
 * `models.ForeignKeyField` are used for a *one-to-many* relationship. Use `model.OneToOneField` for a *one-to-one* relationship
 
 
+* Check if there are pending migrations to be applied: `showmigrations --plan`
 
+* With Postgres you can use text search:
+```python
+Post.objects.filter(title__search="something")
+
+### Search multiple fields:
+from django.contrib.postgres.search import SearchVector
+
+Post.objects.annotate(search=SearchVector("title", "body")).search("django")
+```
+
+
+## Development:
+
+To get right Django HTML formatting in VSCode install `monosans.djLint`
+Then install as tool with uv: `uv tool install djlint`
+Look for tool directory: `uv tool list --show-paths` and add it to the `settings.json`:
+```json
+"[django-html]": {
+  "editor.defaultFormatter": "monosans.djlint",
+  "editor.formatOnSave": true
+},
+"djlint.useVenv": false,
+"djlint.pythonPath": "/home/<USERNAME>/.local/share/uv/tools/djlint/bin/python",
+```
