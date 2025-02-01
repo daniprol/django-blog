@@ -13,3 +13,6 @@ wheels/
 
 *.env
 *.bak
+
+## Dump from DB
+db_data.json
