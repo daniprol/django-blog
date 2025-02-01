@@ -20,3 +20,10 @@ class CommentForm(forms.ModelForm):
 
 class SearchForm(forms.Form):
     query = forms.CharField()
+    trigram = forms.BooleanField(label="Use trigram search", required=False)
+    # ALTERNATIVE:
+    # trigram = forms.CharField(
+    #     label="Use trigram search",
+    #     widget=forms.CheckboxInput,
+    #     required=False
+    # )

@@ -1,6 +1,7 @@
 from typing import Any
 
 from django import template
+from django.conf import settings
 from django.db.models import Count
 from django.utils.safestring import mark_safe
 from markdown import markdown
@@ -36,3 +37,20 @@ def show_latest_posts(count: int = 5) -> dict[str, Any]:  # optional argument
 def markdown_format(text):
     # NOTE: by default Django scapes all generated HTML code output in filters, so we  need to mark it as safe
     return mark_safe(markdown(text))
+
+
+@register.filter(name="get")
+def get(o, index):
+    try:
+        return o[index]
+    except Exception:
+        return settings.TEMPLATE_STRING_IF_INVALID
+
+
+@register.filter(name="getattr")
+def getattrfilter(o, attr):
+    try:
+        attr = getattr(o, attr, None)
+        return attr
+    except Exception:
+        return settings.TEMPLATE_STRING_IF_INVALID

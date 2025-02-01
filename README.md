@@ -107,6 +107,14 @@ Post.objects.annotate(search=SearchVector("title", "body")).search("django")
 `SearchQuery` uses stemming algorithms before creating the search query. If also removes stop words.
 `SearchRank`provides a way to sort results based on how often query terms appear and how close together they are.
 
+* **TRIGRAM EXTENSION**:
+```bash
+./manage.py makemigrations --name=trigram_ext --empty blog
+# Add TrigramExt to operations in migration file...
+./manage.py sqlmigrate blog 000x
+./manage.py migrate blog
+```
+
 ## Development:
 
 To get right Django HTML formatting in VSCode install `monosans.djLint`
