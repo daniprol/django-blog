@@ -128,3 +128,9 @@ Look for tool directory: `uv tool list --show-paths` and add it to the `settings
 "djlint.useVenv": false,
 "djlint.pythonPath": "/home/<USERNAME>/.local/share/uv/tools/djlint/bin/python",
 ```
+
+* Django Debug Toolbar has a command that prints SQL queries without having to modify the logger:
+```bash
+./manage.py debugsqlshell
+# Image.objects.get(id=1)
+```

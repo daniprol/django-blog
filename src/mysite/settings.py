@@ -34,7 +34,9 @@ SITE_ID = 1
 
 # Application definition
 
+# NOTE: Django looks for templates in order. So login templates from our app will be found before django-admin
 INSTALLED_APPS = [
+    "account.apps.AccountConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
