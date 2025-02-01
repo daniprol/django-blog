@@ -1,4 +1,4 @@
-from django.contrib.postgres.search import SearchVector
+from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 from django.core.mail import send_mail
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Count
@@ -145,7 +145,18 @@ def post_search(request: HttpRequest):
         form = SearchForm(request.GET)
         if form.is_valid():
             query = form.cleaned_data["query"]
+            # NOTE: adding the config language will use stemming and stop words!
+            # search_vector = SearchVector("title", "body", config="spanish")
+            search_vector = SearchVector("title", weight="A") + SearchVector("body", weight="B")
+            # creates a text-search vector of lexemes (word roots)
+            search_query = SearchQuery(query)  # , config="spanish")
             # REMEMBER: with annotate you define a new result field (you can then use it to filter, order, ...)
-            results = Post.published.annotate(search=SearchVector("title", "body")).filter(search=query)
+            results = (
+                Post.published.annotate(search=search_vector, rank=SearchRank(search_vector, search_query))
+                .filter(rank__gte=0.3)
+                .order_by("-rank")
+                # Filtering by search would only include results that match the search query
+                # .filter(search=search_query)
+            )
 
     return render(request, "blog/post/search.html", {"form": form, "query": query, "results": results})

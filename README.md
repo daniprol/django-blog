@@ -103,7 +103,9 @@ from django.contrib.postgres.search import SearchVector
 
 Post.objects.annotate(search=SearchVector("title", "body")).search("django")
 ```
-
+> Stemming: reducing words to their base form (*stem*), e.g., `musicality -> music`
+`SearchQuery` uses stemming algorithms before creating the search query. If also removes stop words.
+`SearchRank`provides a way to sort results based on how often query terms appear and how close together they are.
 
 ## Development:
 
