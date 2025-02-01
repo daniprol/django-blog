@@ -1,13 +1,12 @@
 from django.contrib import admin
 from django.db.models import F
+from unfold.admin import ModelAdmin
 
 from .models import Comment, Post
 
-# admin.site.register(Post)
-
 
 @admin.register(Post)
-class PostAdmin(admin.ModelAdmin):
+class PostAdmin(ModelAdmin):
     list_display = ["title", "slug", "author", "publish", "status"]
     list_filter = ["status", "created", "publish", "author"]
     search_fields = ["title", "body"]
@@ -22,7 +21,7 @@ class PostAdmin(admin.ModelAdmin):
 
 
 @admin.register(Comment)
-class CommentAdmin(admin.ModelAdmin):
+class CommentAdmin(ModelAdmin):
     list_display = ["name", "email", "post", "created", "active"]
     list_filter = ["active", "created", "updated"]  # last day, last month...
     search_fields = ["name", "email", "body"]
